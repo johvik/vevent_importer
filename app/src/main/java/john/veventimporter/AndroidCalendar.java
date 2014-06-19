@@ -5,11 +5,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract.Calendars;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 
-public class AndroidCalendar {
+public class AndroidCalendar implements Comparable<AndroidCalendar> {
     private static final String[] CALENDAR_PROJECTION = new String[]{Calendars._ID,
             Calendars.CALENDAR_DISPLAY_NAME};
+
     private long id;
     private String name;
 
@@ -39,8 +42,25 @@ public class AndroidCalendar {
         return res;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String toString() {
         return name + " - " + id;
+    }
+
+    @Override
+    public int compareTo(@NotNull AndroidCalendar other) {
+        int cmp = name.compareTo(other.name);
+        if (cmp == 0) {
+            cmp = Long.valueOf(id).compareTo(other.id);
+        }
+        return cmp;
     }
 }
