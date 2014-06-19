@@ -2,6 +2,7 @@ package john.veventimporter;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,6 +33,10 @@ public class MainActivity extends Activity {
                 ArrayList<VEvent> events = VEventUtils.parseUri(this, intent.getData());
                 for (VEvent e : events) {
                     Log.d("MainActivity", "" + e);
+                }
+                if (events.size() > 0) {
+                    ContentValues values = VEventUtils.toContentValues(events.get(0), -1);
+                    Log.d("MainActivity", "" + values);
                 }
             } catch (VEventException e) {
                 e.printStackTrace();

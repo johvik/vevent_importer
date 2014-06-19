@@ -1,13 +1,25 @@
 package john.veventimporter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
+import android.provider.CalendarContract.Events;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
+import net.fortuna.ical4j.model.Property;
 import net.fortuna.ical4j.model.component.VEvent;
+import net.fortuna.ical4j.model.property.Description;
+import net.fortuna.ical4j.model.property.DtEnd;
+import net.fortuna.ical4j.model.property.DtStart;
+import net.fortuna.ical4j.model.property.Duration;
+import net.fortuna.ical4j.model.property.Geo;
+import net.fortuna.ical4j.model.property.Location;
+import net.fortuna.ical4j.model.property.Organizer;
+import net.fortuna.ical4j.model.property.Summary;
+import net.fortuna.ical4j.model.property.Uid;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -18,6 +30,92 @@ import java.util.ArrayList;
 
 public class VEventUtils {
     private VEventUtils() {
+    }
+
+    /**
+     * Converts the event to content values for insertion.
+     *
+     * @param event      Event to transform.
+     * @param calendarId Id of the calendar to insert into.
+     * @return The transformed content values.
+     * @throws VEventException If it fails to convert the event.
+     */
+    public static ContentValues toContentValues(VEvent event,
+                                                long calendarId) throws VEventException {
+        if (event == null) {
+            throw new VEventException("Event cannot be null");
+        }
+        ContentValues values = new ContentValues();
+
+        // Start with mandatory values
+        values.put(Events.CALENDAR_ID, calendarId);
+        DtStart start = event.getStartDate();
+        if (start == null) {
+            throw new VEventException("DTSTART not found");
+        }
+        values.put(Events.DTSTART, start.getDate().getTime());
+        values.put(Events.EVENT_TIMEZONE, start.getTimeZone().getID());
+
+        // Now see if its recurring or not
+        Property rrule = event.getProperty("RRULE");
+        Property rdate = event.getProperty("RDATE");
+        Duration duration = event.getDuration();
+        boolean isRecurring = (rrule != null || rdate != null) && duration != null;
+        if (isRecurring) {
+            values.put(Events.DURATION, duration.getValue());
+            if (rrule != null) {
+                values.put(Events.RRULE, rrule.getValue());
+            }
+            if (rdate != null) {
+                values.put(Events.RDATE, rdate.getValue());
+            }
+            Property exrule = event.getProperty("EXRULE");
+            if (exrule != null) {
+                values.put(Events.EXRULE, exrule.getValue());
+            }
+            Property exdate = event.getProperty("EXDATE");
+            if (exdate != null) {
+                values.put(Events.EXDATE, exdate.getValue());
+            }
+        } else {
+            DtEnd end = event.getEndDate();
+            if (end != null) {
+                values.put(Events.DTEND, end.getDate().getTime());
+                if (duration == null) {
+                    values.put(Events.EVENT_END_TIMEZONE, end.getTimeZone().getID());
+                }
+            } else {
+                throw new VEventException("Unable to determine DTEND");
+            }
+        }
+
+        // Other values
+        Organizer organizer = event.getOrganizer();
+        if (organizer != null) {
+            values.put(Events.ORGANIZER, organizer.getValue());
+        }
+        Summary summary = event.getSummary();
+        if (summary != null) {
+            values.put(Events.TITLE, summary.getValue());
+        }
+        Location location = event.getLocation();
+        if (location != null) {
+            values.put(Events.EVENT_LOCATION, location.getValue());
+        } else {
+            Geo geo = event.getGeographicPos();
+            if (geo != null) {
+                values.put(Events.EVENT_LOCATION, geo.getValue());
+            }
+        }
+        Description description = event.getDescription();
+        if (description != null) {
+            values.put(Events.DESCRIPTION, description.getValue());
+        }
+        Uid uid = event.getUid();
+        if (uid != null) {
+            values.put(Events.UID_2445, uid.getValue());
+        }
+        return values;
     }
 
     /**
@@ -87,4 +185,3 @@ public class VEventUtils {
         return null;
     }
 }
-
