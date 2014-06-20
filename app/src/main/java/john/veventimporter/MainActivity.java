@@ -21,6 +21,7 @@ public class MainActivity extends Activity implements UriSelectFragment
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // TODO Reminders?
 
         mMainFragment = (MainFragment) getFragmentManager().findFragmentById(R.id.container);
         if (mMainFragment == null) {

@@ -8,6 +8,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.provider.CalendarContract.Events;
 
 import net.fortuna.ical4j.model.component.VEvent;
 
@@ -103,7 +104,7 @@ public class VEventStoreIntentService extends IntentService {
         for (VEvent event : events) {
             try {
                 ContentValues values = VEventUtils.toContentValues(event, calendarId);
-                // TODO getContentResolver().insert(Events.CONTENT_URI, values);
+                getContentResolver().insert(Events.CONTENT_URI, values);
             } catch (VEventException e) {
                 failCount++;
             }
