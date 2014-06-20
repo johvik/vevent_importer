@@ -1,4 +1,4 @@
-package john.veventimporter;
+package john.veventimporter.data;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -13,8 +13,8 @@ public class AndroidCalendar implements Comparable<AndroidCalendar> {
     private static final String[] CALENDAR_PROJECTION = new String[]{Calendars._ID,
             Calendars.CALENDAR_DISPLAY_NAME};
 
-    private long id;
-    private String name;
+    private final long id;
+    private final String name;
 
     public AndroidCalendar(long id, String name) {
         this.id = id;

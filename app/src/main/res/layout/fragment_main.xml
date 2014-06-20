@@ -7,23 +7,19 @@
                 android:paddingLeft="@dimen/activity_horizontal_margin"
                 android:paddingRight="@dimen/activity_horizontal_margin"
                 android:paddingTop="@dimen/activity_vertical_margin"
-                tools:context="john.veventimporter.MainFragment">
+                tools:context="john.veventimporter.fragments.MainFragment">
 
-    <Spinner
-        android:id="@+id/spinnerCalendars"
+    <FrameLayout
+        android:id="@+id/fragmentCalendarSelect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"/>
 
-    <TextView
-        android:id="@+id/textViewEmptySpinner"
+    <FrameLayout
+        android:id="@+id/fragmentUriSelect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:text="@string/no_calendars"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        android:layout_below="@+id/fragmentCalendarSelect"/>
 
     <Button
         android:id="@+id/buttonImport"

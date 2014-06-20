@@ -1,4 +1,4 @@
-package john.veventimporter;
+package john.veventimporter.data;
 
 import android.content.Context;
 import android.view.LayoutInflater;

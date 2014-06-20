@@ -1,9 +1,11 @@
-package john.veventimporter;
+package john.veventimporter.data;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.provider.CalendarContract.Events;
+import android.provider.OpenableColumns;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -27,6 +29,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class VEventUtils {
     private VEventUtils() {
@@ -126,7 +129,7 @@ public class VEventUtils {
      * @return The list of VEvents.
      * @throws VEventException
      */
-    public static ArrayList<VEvent> parseUri(Context context, Uri uri) throws VEventException {
+    public static List<VEvent> parseUri(Context context, Uri uri) throws VEventException {
         if (context == null) {
             throw new VEventException("Context cannot be null");
         }
@@ -183,5 +186,25 @@ public class VEventUtils {
             }
         }
         return null;
+    }
+
+    public static String uriToString(Context context, Uri uri) {
+        String scheme = uri.getScheme();
+        if (scheme != null) {
+            if (scheme.equals("http") || scheme.equals("https")) {
+                return uri.toString();
+            } else if (scheme.equals("content") || scheme.equals("file")) {
+                Cursor cursor = context.getContentResolver().query(uri,
+                        new String[]{OpenableColumns.DISPLAY_NAME}, null, null, null);
+                if (cursor.moveToNext()) {
+                    String name = cursor.getString(0);
+                    cursor.close();
+                    return name;
+                }
+                cursor.close();
+                return uri.getPath();
+            }
+        }
+        return uri.toString();
     }
 }
