@@ -103,7 +103,7 @@ public class VEventStoreIntentService extends IntentService {
         for (VEvent event : events) {
             try {
                 ContentValues values = VEventUtils.toContentValues(event, calendarId);
-                // TODO getContentResolver().insert(uri, values);
+                // TODO getContentResolver().insert(Events.CONTENT_URI, values);
             } catch (VEventException e) {
                 failCount++;
             }
