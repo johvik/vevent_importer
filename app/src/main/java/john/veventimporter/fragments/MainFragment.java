@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import john.veventimporter.R;
+import john.veventimporter.services.VEventStoreIntentService;
 
 public class MainFragment extends Fragment {
     private static final String ARG_URI = "uri";
@@ -88,6 +89,6 @@ public class MainFragment extends Fragment {
             mPreviousNotSelectedToast.show();
             return;
         }
-        // TODO Do the importing
+        VEventStoreIntentService.startActionImport(getActivity(), calendarId, uri);
     }
 }
