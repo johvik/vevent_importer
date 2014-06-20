@@ -3,6 +3,7 @@ package john.veventimporter.fragments;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,11 +19,12 @@ import john.veventimporter.data.AndroidCalendarLoader;
 
 public class CalendarSelectFragment extends Fragment implements LoaderManager
         .LoaderCallbacks<List<AndroidCalendar>> {
+    private static final String PREFS_NAME = "VEventImporterPrefs";
     private static final String SELECTED_POS = "sel_pos";
 
     private Spinner mSpinnerCalendars;
     private AndroidCalendarListAdapter mAdapter;
-    private int mSelectedPosition = -1;
+    private int mSelectedPosition;
 
     public CalendarSelectFragment() {
         // Required empty public constructor
@@ -36,6 +38,23 @@ public class CalendarSelectFragment extends Fragment implements LoaderManager
      */
     public static CalendarSelectFragment newInstance() {
         return new CalendarSelectFragment();
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+        mSelectedPosition = settings.getInt(SELECTED_POS, -1);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        mSelectedPosition = mSpinnerCalendars.getSelectedItemPosition();
+        editor.putInt(SELECTED_POS, mSelectedPosition);
+        editor.commit();
     }
 
     @Override
@@ -58,7 +77,8 @@ public class CalendarSelectFragment extends Fragment implements LoaderManager
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putInt(SELECTED_POS, mSpinnerCalendars.getSelectedItemPosition());
+        mSelectedPosition = mSpinnerCalendars.getSelectedItemPosition();
+        outState.putInt(SELECTED_POS, mSelectedPosition);
         super.onSaveInstanceState(outState);
     }
 
