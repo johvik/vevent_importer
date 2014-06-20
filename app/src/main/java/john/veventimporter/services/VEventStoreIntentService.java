@@ -1,16 +1,19 @@
 package john.veventimporter.services;
 
 import android.app.IntentService;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.util.Log;
 
 import net.fortuna.ical4j.model.component.VEvent;
 
 import java.util.List;
 
+import john.veventimporter.R;
 import john.veventimporter.data.VEventException;
 import john.veventimporter.data.VEventUtils;
 
@@ -19,6 +22,8 @@ public class VEventStoreIntentService extends IntentService {
 
     private static final String EXTRA_CALENDARID = "john.veventimporter.services.extra.CALENDARID";
     private static final String EXTRA_URI = "john.veventimporter.services.extra.URI";
+
+    private static int NOTIFICATION_ID = 0;
 
     public VEventStoreIntentService() {
         super("VEventStoreIntentService");
@@ -57,27 +62,60 @@ public class VEventStoreIntentService extends IntentService {
      * parameters.
      */
     private void handleActionImport(Long calendarId, Uri uri) {
+        final int id = NOTIFICATION_ID++;
+
+        NotificationManager notificationManager = (NotificationManager) getSystemService(Context
+                .NOTIFICATION_SERVICE);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, new Intent(), 0);
+        Notification.Builder builder = new Notification.Builder(this).setSmallIcon(R.drawable
+                .ic_stat_import).setContentTitle(getString(R.string.app_name)).setContentIntent
+                (pendingIntent).setAutoCancel(true);
+
         if (calendarId == null || uri == null) {
-            return; // TODO Notify
+            builder.setContentText(getString(R.string.notification_import_general_error));
+            notificationManager.notify(id, builder.build());
+            return;
         }
+
+        builder.setContentText(getString(R.string.notification_import_parsing));
+        builder.setProgress(1, 0, false);
+        notificationManager.notify(id, builder.build());
 
         List<VEvent> events;
         try {
             events = VEventUtils.parseUri(this, uri);
         } catch (VEventException e) {
             e.printStackTrace();
-            return; // TODO Notify
+            builder.setContentText(getString(R.string.notification_import_parse_error));
+            notificationManager.notify(id, builder.build());
+            return;
         }
+
+        final int count = events.size();
+        final int maxProgress = count + 1;
+        builder.setContentText(getString(R.string.notification_import_saving));
+        // Count parse as 1
+        int progress = 1;
+        int failCount = 0;
+        builder.setProgress(maxProgress, progress, false);
+        notificationManager.notify(id, builder.build());
 
         for (VEvent event : events) {
             try {
                 ContentValues values = VEventUtils.toContentValues(event, calendarId);
-                //getContentResolver().insert(uri, values);
+                // TODO getContentResolver().insert(uri, values);
             } catch (VEventException e) {
-                e.printStackTrace();
-                return; // TODO Notify
+                failCount++;
             }
+            progress++;
+            builder.setProgress(maxProgress, progress, false);
+            notificationManager.notify(id, builder.build());
         }
-        Log.d("VEventStoreIntentService", "handleActionImport " + calendarId + " " + uri);
+
+        final int savedCount = count - failCount;
+        builder.setContentText(getResources().getQuantityString(R.plurals
+                .notification_import_done, savedCount, savedCount));
+        builder.setProgress(0, 0, false);
+        notificationManager.notify(id, builder.build());
     }
 }

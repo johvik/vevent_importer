@@ -17,7 +17,7 @@ public class MainFragment extends Fragment {
 
     private CalendarSelectFragment mCalendarSelectFragment;
     private UriSelectFragment mUriSelectFragment;
-    private Toast mPreviousNotSelectedToast;
+    private Toast mPreviousImportToast;
 
     public MainFragment() {
         // Required empty public constructor
@@ -74,21 +74,24 @@ public class MainFragment extends Fragment {
     }
 
     private void importData(Long calendarId, Uri uri) {
-        if (mPreviousNotSelectedToast != null) {
-            mPreviousNotSelectedToast.cancel();
+        if (mPreviousImportToast != null) {
+            mPreviousImportToast.cancel();
         }
         if (calendarId == null) {
-            mPreviousNotSelectedToast = Toast.makeText(getActivity(),
-                    R.string.no_calendar_selected, Toast.LENGTH_SHORT);
-            mPreviousNotSelectedToast.show();
+            mPreviousImportToast = Toast.makeText(getActivity(), R.string.no_calendar_selected,
+                    Toast.LENGTH_SHORT);
+            mPreviousImportToast.show();
             return;
         }
         if (uri == null) {
-            mPreviousNotSelectedToast = Toast.makeText(getActivity(), R.string.no_uri_selected,
+            mPreviousImportToast = Toast.makeText(getActivity(), R.string.no_uri_selected,
                     Toast.LENGTH_SHORT);
-            mPreviousNotSelectedToast.show();
+            mPreviousImportToast.show();
             return;
         }
         VEventStoreIntentService.startActionImport(getActivity(), calendarId, uri);
+        mPreviousImportToast = Toast.makeText(getActivity(), R.string.import_started,
+                Toast.LENGTH_SHORT);
+        mPreviousImportToast.show();
     }
 }

@@ -12,5 +12,15 @@
     <string name="no_file_manager_info">No file manager found</string>
     <string name="no_calendar_selected">No calendar selected</string>
     <string name="no_uri_selected">No file selected</string>
+    <string name="notification_import_general_error">Import failed</string>
+    <string name="notification_import_parse_error">Import failed, could not parse the data</string>
+    <string name="notification_import_parsing">Parsing data…</string>
+    <string name="notification_import_saving">Saving events…</string>
+    <string name="import_started">Importing…</string>
+
+    <plurals name="notification_import_done">
+        <item quantity="one">Added one event</item>
+        <item quantity="other">Added %d events</item>
+    </plurals>
 
 </resources>
