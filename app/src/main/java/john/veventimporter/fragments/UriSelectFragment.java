@@ -2,7 +2,6 @@ package john.veventimporter.fragments;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,16 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import john.veventimporter.R;
 import john.veventimporter.data.VEventUtils;
 
 public class UriSelectFragment extends Fragment {
-    private static final int FILE_SELECT_CODE = 0;
     private static final String ARG_URI = "uri";
     private static final String STATE_URI = "state_uri";
 
+    private OnFragmentInteractionListener mListener;
     private TextView mTextViewUri;
     private Uri mUri;
 
@@ -69,7 +67,9 @@ public class UriSelectFragment extends Fragment {
         buttonBrowse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showFileChooser();
+                if (mListener != null) {
+                    mListener.onBrowseClick();
+                }
             }
         });
 
@@ -79,28 +79,20 @@ public class UriSelectFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case FILE_SELECT_CODE:
-                if (resultCode == Activity.RESULT_OK) {
-                    mUri = data.getData();
-                    updateUriText();
-                }
-                break;
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        try {
+            mListener = (OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString() + " must implement " +
+                    "OnFragmentInteractionListener");
         }
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
-    private void showFileChooser() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("text/calendar");
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        try {
-            startActivityForResult(Intent.createChooser(intent,
-                    getString(R.string.calendar_chooser_title)), FILE_SELECT_CODE);
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(getActivity(), R.string.no_file_manager_info, Toast.LENGTH_LONG).show();
-        }
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 
     private void updateUriText() {
@@ -118,5 +110,19 @@ public class UriSelectFragment extends Fragment {
      */
     public Uri getSelectedUri() {
         return mUri;
+    }
+
+    /**
+     * Sets the selected uri.
+     *
+     * @param uri The new uri.
+     */
+    public void setSelectedUri(Uri uri) {
+        mUri = uri;
+        updateUriText();
+    }
+
+    public interface OnFragmentInteractionListener {
+        public void onBrowseClick();
     }
 }

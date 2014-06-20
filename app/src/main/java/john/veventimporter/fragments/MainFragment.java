@@ -94,4 +94,15 @@ public class MainFragment extends Fragment {
                 Toast.LENGTH_SHORT);
         mPreviousImportToast.show();
     }
+
+    /**
+     * Sets the selected uri.
+     *
+     * @param uri The new uri.
+     */
+    public void setSelectedUri(Uri uri) {
+        if (mUriSelectFragment != null) {
+            mUriSelectFragment.setSelectedUri(uri);
+        }
+    }
 }
