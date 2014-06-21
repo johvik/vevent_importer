@@ -1,6 +1,7 @@
 package john.veventimporter.fragments;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -110,6 +111,15 @@ public class MainFragment extends Fragment {
         mPreviousImportToast = Toast.makeText(getActivity(), R.string.import_started,
                 Toast.LENGTH_SHORT);
         mPreviousImportToast.show();
+
+        // Quit after clicking import when its a action view
+        if (isActionView()) {
+            getActivity().finish();
+        }
+    }
+
+    private boolean isActionView() {
+        return getActivity().getIntent().getAction().contentEquals(Intent.ACTION_VIEW);
     }
 
     /**
