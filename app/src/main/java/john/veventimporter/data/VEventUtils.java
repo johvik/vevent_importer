@@ -12,6 +12,7 @@ import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
 import net.fortuna.ical4j.model.Component;
 import net.fortuna.ical4j.model.Property;
+import net.fortuna.ical4j.model.TimeZone;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
@@ -84,8 +85,9 @@ public class VEventUtils {
             DtEnd end = event.getEndDate();
             if (end != null) {
                 values.put(Events.DTEND, end.getDate().getTime());
-                if (duration == null) {
-                    values.put(Events.EVENT_END_TIMEZONE, end.getTimeZone().getID());
+                TimeZone endTimezone = end.getTimeZone();
+                if (duration == null && endTimezone != null) {
+                    values.put(Events.EVENT_END_TIMEZONE, endTimezone.getID());
                 }
             } else {
                 throw new VEventException("Unable to determine DTEND");
