@@ -5,9 +5,9 @@
     <string name="action_settings">Settings</string>
     <string name="no_calendars">No calendars found</string>
     <string name="button_import">Import</string>
+    <string name="button_import_arg">Import %1$s</string>
     <string name="calendars_spinner_title">Import into</string>
-    <string name="button_browse">Browse</string>
-    <string name="no_file_selected">No file selected</string>
+    <string name="button_select_file">Select file</string>
     <string name="calendar_chooser_title">Select calendar file</string>
     <string name="no_file_manager_info">No file manager found</string>
     <string name="no_calendar_selected">No calendar selected</string>
@@ -19,6 +19,7 @@
     <string name="import_started">Importing…</string>
 
     <plurals name="notification_import_done">
+        <item quantity="zero">Imported zero events</item>
         <item quantity="one">Imported one event</item>
         <item quantity="other">Imported %d events</item>
     </plurals>

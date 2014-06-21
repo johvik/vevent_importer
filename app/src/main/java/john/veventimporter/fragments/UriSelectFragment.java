@@ -8,17 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.TextView;
 
 import john.veventimporter.R;
-import john.veventimporter.data.VEventUtils;
 
 public class UriSelectFragment extends Fragment {
     private static final String ARG_URI = "uri";
     private static final String STATE_URI = "state_uri";
 
     private OnFragmentInteractionListener mListener;
-    private TextView mTextViewUri;
     private Uri mUri;
 
     public UriSelectFragment() {
@@ -63,18 +60,16 @@ public class UriSelectFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_uri_select, container, false);
 
-        Button buttonBrowse = (Button) rootView.findViewById(R.id.buttonBrowse);
-        buttonBrowse.setOnClickListener(new View.OnClickListener() {
+        Button buttonSelectFile = (Button) rootView.findViewById(R.id.buttonSelectFile);
+        buttonSelectFile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (mListener != null) {
-                    mListener.onBrowseClick();
+                    mListener.onSelectFileClick();
                 }
             }
         });
 
-        mTextViewUri = (TextView) rootView.findViewById(R.id.textViewUri);
-        updateUriText();
         return rootView;
     }
 
@@ -95,14 +90,6 @@ public class UriSelectFragment extends Fragment {
         mListener = null;
     }
 
-    private void updateUriText() {
-        if (mUri != null) {
-            mTextViewUri.setText(VEventUtils.uriToString(getActivity(), mUri));
-        } else {
-            mTextViewUri.setText(getString(R.string.no_file_selected));
-        }
-    }
-
     /**
      * Gets the selected uri.
      *
@@ -119,10 +106,9 @@ public class UriSelectFragment extends Fragment {
      */
     public void setSelectedUri(Uri uri) {
         mUri = uri;
-        updateUriText();
     }
 
     public interface OnFragmentInteractionListener {
-        public void onBrowseClick();
+        public void onSelectFileClick();
     }
 }

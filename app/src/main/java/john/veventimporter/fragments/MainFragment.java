@@ -10,6 +10,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import john.veventimporter.R;
+import john.veventimporter.data.VEventUtils;
 import john.veventimporter.services.VEventStoreIntentService;
 
 public class MainFragment extends Fragment {
@@ -18,6 +19,7 @@ public class MainFragment extends Fragment {
     private CalendarSelectFragment mCalendarSelectFragment;
     private UriSelectFragment mUriSelectFragment;
     private Toast mPreviousImportToast;
+    private Button mButtonImport;
 
     public MainFragment() {
         // Required empty public constructor
@@ -45,14 +47,16 @@ public class MainFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mUriSelectFragment = (UriSelectFragment) getFragmentManager().findFragmentById(R.id
                 .fragmentUriSelect);
+        Uri uri = null;
         if (mUriSelectFragment == null) {
-            Uri uri = null;
             if (getArguments() != null) {
                 uri = getArguments().getParcelable(ARG_URI);
             }
             mUriSelectFragment = UriSelectFragment.newInstance(uri);
             getFragmentManager().beginTransaction().add(R.id.fragmentUriSelect,
                     mUriSelectFragment).commit();
+        } else {
+            uri = mUriSelectFragment.getSelectedUri();
         }
 
         mCalendarSelectFragment = (CalendarSelectFragment) getFragmentManager().findFragmentById
@@ -62,15 +66,27 @@ public class MainFragment extends Fragment {
             getFragmentManager().beginTransaction().add(R.id.fragmentCalendarSelect,
                     mCalendarSelectFragment).commit();
         }
-        Button buttonImport = (Button) rootView.findViewById(R.id.buttonImport);
-        buttonImport.setOnClickListener(new View.OnClickListener() {
+        mButtonImport = (Button) rootView.findViewById(R.id.buttonImport);
+        mButtonImport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 importData(mCalendarSelectFragment.getSelectedCalendarId(),
                         mUriSelectFragment.getSelectedUri());
             }
         });
+        updateImportButton(uri);
         return rootView;
+    }
+
+    private void updateImportButton(Uri uri) {
+        if (uri == null) {
+            mButtonImport.setText(R.string.button_import);
+            mButtonImport.setEnabled(false);
+        } else {
+            mButtonImport.setText(getString(R.string.button_import_arg,
+                    VEventUtils.uriToString(getActivity(), uri)));
+            mButtonImport.setEnabled(true);
+        }
     }
 
     private void importData(Long calendarId, Uri uri) {
@@ -89,6 +105,7 @@ public class MainFragment extends Fragment {
             mPreviousImportToast.show();
             return;
         }
+        setSelectedUri(null);
         VEventStoreIntentService.startActionImport(getActivity(), calendarId, uri);
         mPreviousImportToast = Toast.makeText(getActivity(), R.string.import_started,
                 Toast.LENGTH_SHORT);
@@ -104,5 +121,6 @@ public class MainFragment extends Fragment {
         if (mUriSelectFragment != null) {
             mUriSelectFragment.setSelectedUri(uri);
         }
+        updateImportButton(uri);
     }
 }

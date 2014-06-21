@@ -68,7 +68,7 @@ public class MainActivity extends Activity implements UriSelectFragment
     }
 
     @Override
-    public void onBrowseClick() {
+    public void onSelectFileClick() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("text/calendar");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
