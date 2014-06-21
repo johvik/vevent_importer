@@ -4,6 +4,7 @@ import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -79,7 +80,7 @@ public class VEventStoreIntentService extends IntentService {
         }
 
         builder.setContentText(getString(R.string.notification_import_parsing));
-        builder.setProgress(1, 0, false);
+        builder.setProgress(0, 0, true);
         notificationManager.notify(id, builder.build());
 
         List<VEvent> events;
@@ -93,24 +94,37 @@ public class VEventStoreIntentService extends IntentService {
         }
 
         final int count = events.size();
-        final int maxProgress = count + 1;
         builder.setContentText(getString(R.string.notification_import_saving));
-        // Count parse as 1
-        int progress = 1;
+        int progress = 0;
         int failCount = 0;
-        builder.setProgress(maxProgress, progress, false);
+        builder.setProgress(count, progress, false);
         notificationManager.notify(id, builder.build());
 
+        Uri firstEvent = null;
         for (VEvent event : events) {
             try {
                 ContentValues values = VEventUtils.toContentValues(event, calendarId);
-                getContentResolver().insert(Events.CONTENT_URI, values);
+                Uri eventUri = getContentResolver().insert(Events.CONTENT_URI, values);
+                if (firstEvent == null) {
+                    firstEvent = eventUri;
+                }
             } catch (VEventException e) {
                 failCount++;
             }
             progress++;
-            builder.setProgress(maxProgress, progress, false);
+            builder.setProgress(count, progress, false);
             notificationManager.notify(id, builder.build());
+        }
+
+        // Start the calendar to show the first saved event
+        if (firstEvent != null) {
+            long firstId = Long.parseLong(firstEvent.getLastPathSegment());
+            Uri first = ContentUris.withAppendedId(Events.CONTENT_URI, firstId);
+
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(first);
+            PendingIntent p = PendingIntent.getActivity(this, 0, intent, 0);
+            builder.setContentIntent(p);
         }
 
         final int savedCount = count - failCount;
