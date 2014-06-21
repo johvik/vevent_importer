@@ -11,6 +11,7 @@ import john.veventimporter.fragments.UriSelectFragment;
 
 public class MainActivity extends Activity implements UriSelectFragment
         .OnFragmentInteractionListener {
+    public static final String PREFS_NAME = "VEventImporterPrefs";
     private static final int FILE_SELECT_CODE = 0;
 
     private MainFragment mMainFragment;
@@ -19,7 +20,6 @@ public class MainActivity extends Activity implements UriSelectFragment
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // TODO Reminders?
 
         mMainFragment = (MainFragment) getFragmentManager().findFragmentById(R.id.container);
         if (mMainFragment == null) {

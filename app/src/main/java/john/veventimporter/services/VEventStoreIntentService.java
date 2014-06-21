@@ -10,6 +10,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.CalendarContract.Events;
+import android.provider.CalendarContract.Reminders;
 
 import net.fortuna.ical4j.model.component.VEvent;
 
@@ -24,6 +25,7 @@ public class VEventStoreIntentService extends IntentService {
 
     private static final String EXTRA_CALENDARID = "john.veventimporter.services.extra.CALENDARID";
     private static final String EXTRA_URI = "john.veventimporter.services.extra.URI";
+    private static final String EXTRA_REMINDER = "john.veventimporter.services.extra.REMINDER";
 
     private static int NOTIFICATION_ID = 0;
 
@@ -39,11 +41,13 @@ public class VEventStoreIntentService extends IntentService {
      *
      * @see IntentService
      */
-    public static void startActionImport(Context context, Long calendarId, Uri uri) {
+    public static void startActionImport(Context context, Long calendarId, Uri uri,
+                                         Integer reminder) {
         Intent intent = new Intent(context, VEventStoreIntentService.class);
         intent.setAction(ACTION_IMPORT);
         intent.putExtra(EXTRA_CALENDARID, calendarId);
         intent.putExtra(EXTRA_URI, uri);
+        intent.putExtra(EXTRA_REMINDER, reminder);
         context.startService(intent);
     }
 
@@ -54,7 +58,8 @@ public class VEventStoreIntentService extends IntentService {
             if (ACTION_IMPORT.equals(action)) {
                 final Long calendarId = (Long) intent.getSerializableExtra(EXTRA_CALENDARID);
                 final Uri uri = intent.getParcelableExtra(EXTRA_URI);
-                handleActionImport(calendarId, uri);
+                final Integer reminder = (Integer) intent.getSerializableExtra(EXTRA_REMINDER);
+                handleActionImport(calendarId, uri, reminder);
             }
         }
     }
@@ -63,7 +68,7 @@ public class VEventStoreIntentService extends IntentService {
      * Handle action Import in the provided background thread with the provided
      * parameters.
      */
-    private void handleActionImport(Long calendarId, Uri uri) {
+    private void handleActionImport(Long calendarId, Uri uri, Integer reminder) {
         final int id = NOTIFICATION_ID++;
 
         NotificationManager notificationManager = (NotificationManager) getSystemService(Context
@@ -100,13 +105,27 @@ public class VEventStoreIntentService extends IntentService {
         builder.setProgress(count, progress, false);
         notificationManager.notify(id, builder.build());
 
-        Uri firstEvent = null;
+        Long firstEventId = null;
         for (VEvent event : events) {
             try {
                 ContentValues values = VEventUtils.toContentValues(event, calendarId);
+                if (reminder != null) {
+                    values.put(Events.HAS_ALARM, 1);
+                }
                 Uri eventUri = getContentResolver().insert(Events.CONTENT_URI, values);
-                if (firstEvent == null) {
-                    firstEvent = eventUri;
+
+                long eventId = Long.parseLong(eventUri.getLastPathSegment());
+                // Add reminder
+                if (reminder != null) {
+                    ContentValues reminderValues = new ContentValues();
+                    reminderValues.put(Reminders.EVENT_ID, eventId);
+                    reminderValues.put(Reminders.MINUTES, reminder);
+                    reminderValues.put(Reminders.METHOD, Reminders.METHOD_ALARM);
+                    getContentResolver().insert(Reminders.CONTENT_URI, reminderValues);
+                }
+
+                if (firstEventId == null) {
+                    firstEventId = eventId;
                 }
             } catch (VEventException e) {
                 failCount++;
@@ -117,9 +136,8 @@ public class VEventStoreIntentService extends IntentService {
         }
 
         // Start the calendar to show the first saved event
-        if (firstEvent != null) {
-            long firstId = Long.parseLong(firstEvent.getLastPathSegment());
-            Uri first = ContentUris.withAppendedId(Events.CONTENT_URI, firstId);
+        if (firstEventId != null) {
+            Uri first = ContentUris.withAppendedId(Events.CONTENT_URI, firstEventId);
 
             Intent intent = new Intent(Intent.ACTION_VIEW);
             intent.setData(first);

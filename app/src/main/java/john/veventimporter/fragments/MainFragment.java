@@ -19,6 +19,8 @@ public class MainFragment extends Fragment {
 
     private CalendarSelectFragment mCalendarSelectFragment;
     private UriSelectFragment mUriSelectFragment;
+    private ReminderSelectFragment mReminderSelectFragment;
+
     private Toast mPreviousImportToast;
     private Button mButtonImport;
 
@@ -67,12 +69,22 @@ public class MainFragment extends Fragment {
             getFragmentManager().beginTransaction().add(R.id.fragmentCalendarSelect,
                     mCalendarSelectFragment).commit();
         }
+
+        mReminderSelectFragment = (ReminderSelectFragment) getFragmentManager().findFragmentById
+                (R.id.fragmentReminderSelect);
+        if (mReminderSelectFragment == null) {
+            mReminderSelectFragment = ReminderSelectFragment.newInstance();
+            getFragmentManager().beginTransaction().add(R.id.fragmentReminderSelect,
+                    mReminderSelectFragment).commit();
+        }
+
         mButtonImport = (Button) rootView.findViewById(R.id.buttonImport);
         mButtonImport.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 importData(mCalendarSelectFragment.getSelectedCalendarId(),
-                        mUriSelectFragment.getSelectedUri());
+                        mUriSelectFragment.getSelectedUri(),
+                        mReminderSelectFragment.getSelectedReminder());
             }
         });
         updateImportButton(uri);
@@ -90,7 +102,7 @@ public class MainFragment extends Fragment {
         }
     }
 
-    private void importData(Long calendarId, Uri uri) {
+    private void importData(Long calendarId, Uri uri, Integer reminder) {
         if (mPreviousImportToast != null) {
             mPreviousImportToast.cancel();
         }
@@ -107,7 +119,7 @@ public class MainFragment extends Fragment {
             return;
         }
         setSelectedUri(null);
-        VEventStoreIntentService.startActionImport(getActivity(), calendarId, uri);
+        VEventStoreIntentService.startActionImport(getActivity(), calendarId, uri, reminder);
         mPreviousImportToast = Toast.makeText(getActivity(), R.string.import_started,
                 Toast.LENGTH_SHORT);
         mPreviousImportToast.show();

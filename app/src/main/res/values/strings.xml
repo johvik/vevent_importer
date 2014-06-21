@@ -16,11 +16,31 @@
     <string name="notification_import_parsing">Parsing data…</string>
     <string name="notification_import_saving">Saving events…</string>
     <string name="import_started">Importing…</string>
+    <string name="reminder_spinner_title">Add reminder</string>
 
     <plurals name="notification_import_done">
         <item quantity="zero">Imported zero events</item>
         <item quantity="one">Imported one event</item>
         <item quantity="other">Imported %d events</item>
     </plurals>
+
+    <string-array name="reminders_array">
+        <item>None</item>
+        <item>Default</item>
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>20 minutes</item>
+        <item>25 minutes</item>
+        <item>30 minutes</item>
+        <item>45 minutes</item>
+        <item>1 hour</item>
+        <item>2 hours</item>
+        <item>3 hours</item>
+        <item>12 hours</item>
+        <item>24 hours</item>
+        <item>2 days</item>
+        <item>1 week</item>
+    </string-array>
 
 </resources>

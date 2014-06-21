@@ -16,10 +16,16 @@
         android:layout_alignParentTop="true"/>
 
     <FrameLayout
-        android:id="@+id/fragmentUriSelect"
+        android:id="@+id/fragmentReminderSelect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/fragmentCalendarSelect"/>
+
+    <FrameLayout
+        android:id="@+id/fragmentUriSelect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fragmentReminderSelect"/>
 
     <Button
         android:id="@+id/buttonImport"

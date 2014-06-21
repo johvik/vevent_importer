@@ -12,6 +12,7 @@ import android.widget.Spinner;
 
 import java.util.List;
 
+import john.veventimporter.MainActivity;
 import john.veventimporter.R;
 import john.veventimporter.data.AndroidCalendar;
 import john.veventimporter.data.AndroidCalendarListAdapter;
@@ -19,8 +20,7 @@ import john.veventimporter.data.AndroidCalendarLoader;
 
 public class CalendarSelectFragment extends Fragment implements LoaderManager
         .LoaderCallbacks<List<AndroidCalendar>> {
-    private static final String PREFS_NAME = "VEventImporterPrefs";
-    private static final String SELECTED_POS = "sel_pos";
+    private static final String SELECTED_POS = "cal_sel_pos";
 
     private Spinner mSpinnerCalendars;
     private AndroidCalendarListAdapter mAdapter;
@@ -43,14 +43,14 @@ public class CalendarSelectFragment extends Fragment implements LoaderManager
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
         mSelectedPosition = settings.getInt(SELECTED_POS, -1);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        SharedPreferences settings = getActivity().getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences settings = getActivity().getSharedPreferences(MainActivity.PREFS_NAME, 0);
         SharedPreferences.Editor editor = settings.edit();
         mSelectedPosition = mSpinnerCalendars.getSelectedItemPosition();
         editor.putInt(SELECTED_POS, mSelectedPosition);
