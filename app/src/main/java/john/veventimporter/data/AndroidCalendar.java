@@ -8,6 +8,7 @@ import android.provider.CalendarContract.Calendars;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class AndroidCalendar implements Comparable<AndroidCalendar> {
     private static final String[] CALENDAR_PROJECTION = new String[]{Calendars._ID,
@@ -27,7 +28,7 @@ public class AndroidCalendar implements Comparable<AndroidCalendar> {
      * @param context Context used to resolve the content.
      * @return The list of AndroidCalendars.
      */
-    public static ArrayList<AndroidCalendar> getCalendars(Context context) {
+    public static List<AndroidCalendar> getCalendars(Context context) {
         if (context == null) {
             throw new NullPointerException("Context cannot be null");
         }

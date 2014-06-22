@@ -2,6 +2,11 @@ package john.veventimporter.data;
 
 import junit.framework.TestCase;
 
+import java.util.List;
+
+import john.veventimporter.mock.FakeAndroidCalendarCursor;
+import john.veventimporter.mock.FakeContext;
+
 public class AndroidCalendarTest extends TestCase {
     private AndroidCalendar mAndroidCalendar;
     private long id = 1;
@@ -13,7 +18,17 @@ public class AndroidCalendarTest extends TestCase {
     }
 
     public void testGetCalendars() {
-        // TODO
+        FakeAndroidCalendarCursor androidCalendarCursor = new FakeAndroidCalendarCursor();
+        FakeContext context = new FakeContext(androidCalendarCursor);
+
+        List<AndroidCalendar> calendars = AndroidCalendar.getCalendars(context);
+        assertEquals(0, calendars.size());
+
+        androidCalendarCursor.addData(mAndroidCalendar);
+
+        calendars = AndroidCalendar.getCalendars(context);
+        assertEquals(1, calendars.size());
+        assertEquals(0, mAndroidCalendar.compareTo(calendars.get(0)));
     }
 
     public void testGetId() {

@@ -2,7 +2,6 @@ package john.veventimporter.data;
 
 import android.content.Context;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,7 +12,7 @@ public class AndroidCalendarLoader extends MyAsyncTaskLoader<List<AndroidCalenda
 
     @Override
     public List<AndroidCalendar> loadInBackground() {
-        ArrayList<AndroidCalendar> list = AndroidCalendar.getCalendars(getContext());
+        List<AndroidCalendar> list = AndroidCalendar.getCalendars(getContext());
         Collections.sort(list);
         return list;
     }
