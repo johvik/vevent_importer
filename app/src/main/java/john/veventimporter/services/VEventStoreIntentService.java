@@ -108,22 +108,8 @@ public class VEventStoreIntentService extends IntentService {
         Long firstEventId = null;
         for (VEvent event : events) {
             try {
-                ContentValues values = VEventUtils.toContentValues(event, calendarId);
-                if (reminder != null) {
-                    values.put(Events.HAS_ALARM, 1);
-                }
-                Uri eventUri = getContentResolver().insert(Events.CONTENT_URI, values);
-
-                long eventId = Long.parseLong(eventUri.getLastPathSegment());
-                // Add reminder
-                if (reminder != null) {
-                    ContentValues reminderValues = new ContentValues();
-                    reminderValues.put(Reminders.EVENT_ID, eventId);
-                    reminderValues.put(Reminders.MINUTES, reminder);
-                    reminderValues.put(Reminders.METHOD, Reminders.METHOD_ALARM);
-                    getContentResolver().insert(Reminders.CONTENT_URI, reminderValues);
-                }
-
+                // No point in adding the reminder since it does not seem to work...
+                long eventId = saveEvent(event, calendarId, null);
                 if (firstEventId == null) {
                     firstEventId = eventId;
                 }
@@ -150,5 +136,21 @@ public class VEventStoreIntentService extends IntentService {
                 .notification_import_done, savedCount, savedCount));
         builder.setProgress(0, 0, false);
         notificationManager.notify(id, builder.build());
+    }
+
+    private long saveEvent(VEvent event, Long calendarId, Integer reminder) throws VEventException {
+        ContentValues values = VEventUtils.toContentValues(event, calendarId);
+        Uri eventUri = getContentResolver().insert(Events.CONTENT_URI, values);
+
+        long eventId = Long.parseLong(eventUri.getLastPathSegment());
+        // Add reminder
+        if (reminder != null) {
+            ContentValues reminderValues = new ContentValues();
+            reminderValues.put(Reminders.EVENT_ID, eventId);
+            reminderValues.put(Reminders.MINUTES, reminder);
+            reminderValues.put(Reminders.METHOD, Reminders.METHOD_ALARM);
+            getContentResolver().insert(Reminders.CONTENT_URI, reminderValues);
+        }
+        return eventId;
     }
 }
