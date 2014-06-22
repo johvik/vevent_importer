@@ -3,11 +3,12 @@ package john.veventimporter.mock;
 import android.test.mock.MockCursor;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import john.veventimporter.data.AndroidCalendar;
 
 public class FakeAndroidCalendarCursor extends MockCursor {
-    private ArrayList<AndroidCalendar> mData;
+    private List<AndroidCalendar> mData;
     private int position;
 
     public FakeAndroidCalendarCursor() {
@@ -19,7 +20,11 @@ public class FakeAndroidCalendarCursor extends MockCursor {
         position = -1;
     }
 
-    public void setData(ArrayList<AndroidCalendar> data) {
+    public List<AndroidCalendar> getData() {
+        return mData;
+    }
+
+    public void setData(List<AndroidCalendar> data) {
         mData = data;
         position = -1;
     }

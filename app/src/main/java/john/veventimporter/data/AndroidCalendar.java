@@ -64,4 +64,19 @@ public class AndroidCalendar implements Comparable<AndroidCalendar> {
         }
         return cmp;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        return this == o || o instanceof AndroidCalendar && compareTo((AndroidCalendar) o) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+
+        result = 31 * result + (int) (id ^ (id >>> 32));
+        result = 31 * result + (name == null ? 0 : name.hashCode());
+
+        return result;
+    }
 }

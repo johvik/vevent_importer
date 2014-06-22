@@ -7,6 +7,12 @@ import java.util.List;
 import john.veventimporter.mock.FakeAndroidCalendarCursor;
 import john.veventimporter.mock.FakeContext;
 
+import static org.hamcrest.CoreMatchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+
 public class AndroidCalendarTest extends TestCase {
     private AndroidCalendar mAndroidCalendar;
     private long id = 1;
@@ -23,12 +29,13 @@ public class AndroidCalendarTest extends TestCase {
 
         List<AndroidCalendar> calendars = AndroidCalendar.getCalendars(context);
         assertEquals(0, calendars.size());
+        assertThat(calendars, equalTo(androidCalendarCursor.getData()));
 
         androidCalendarCursor.addData(mAndroidCalendar);
 
         calendars = AndroidCalendar.getCalendars(context);
         assertEquals(1, calendars.size());
-        assertEquals(0, mAndroidCalendar.compareTo(calendars.get(0)));
+        assertThat(calendars, equalTo(androidCalendarCursor.getData()));
     }
 
     public void testGetId() {
@@ -44,19 +51,52 @@ public class AndroidCalendarTest extends TestCase {
     }
 
     public void testCompareTo() {
-        AndroidCalendar other = new AndroidCalendar(id, name);
-        assertEquals(0, mAndroidCalendar.compareTo(other));
+        assertEquals("Same object", 0, mAndroidCalendar.compareTo(mAndroidCalendar));
 
-        other = new AndroidCalendar(id - 1, name);
-        assertEquals(true, mAndroidCalendar.compareTo(other) > 0);
+        assertEquals("Same arguments", 0, mAndroidCalendar.compareTo(new AndroidCalendar(id,
+                name)));
 
-        other = new AndroidCalendar(id + 1, name);
-        assertEquals(true, mAndroidCalendar.compareTo(other) < 0);
+        assertThat("Smaller id", 0, lessThan(mAndroidCalendar.compareTo(new AndroidCalendar(id -
+                1, name))));
 
-        other = new AndroidCalendar(id, "a" + name);
-        assertEquals(true, mAndroidCalendar.compareTo(other) > 0);
+        assertThat("Bigger id", 0, greaterThan(mAndroidCalendar.compareTo(new AndroidCalendar(id
+                + 1, name))));
 
-        other = new AndroidCalendar(id, "b" + name);
-        assertEquals(true, mAndroidCalendar.compareTo(other) < 0);
+        assertThat("Smaller name", 0, lessThan(mAndroidCalendar.compareTo(new AndroidCalendar(id,
+                "a" + name))));
+
+        assertThat("Bigger name", 0, greaterThan(mAndroidCalendar.compareTo(new AndroidCalendar
+                (id, "b" + name))));
+    }
+
+    public void testEquals() {
+        assertEquals("Same object", true, mAndroidCalendar.equals(mAndroidCalendar));
+
+        assertEquals("Same arguments", true, mAndroidCalendar.equals(new AndroidCalendar(id,
+                name)));
+
+        assertEquals("Another type", false, mAndroidCalendar.equals(new Object()));
+
+        assertEquals("Other arguments", false, mAndroidCalendar.equals(new AndroidCalendar(id -
+                1, name)));
+    }
+
+    public void testHashCode() {
+        assertEquals("Same object", mAndroidCalendar.hashCode(), mAndroidCalendar.hashCode());
+
+        assertEquals("Same arguments", mAndroidCalendar.hashCode(), new AndroidCalendar(id,
+                name).hashCode());
+
+        assertNotEquals("Smaller id", mAndroidCalendar.hashCode(), new AndroidCalendar(id - 1,
+                name).hashCode());
+
+        assertNotEquals("Bigger id", mAndroidCalendar.hashCode(), new AndroidCalendar(id + 1,
+                name).hashCode());
+
+        assertNotEquals("Smaller name", mAndroidCalendar.hashCode(), new AndroidCalendar(id,
+                "a" + name).hashCode());
+
+        assertNotEquals("Bigger name", mAndroidCalendar.hashCode(), new AndroidCalendar(id,
+                "b" + name).hashCode());
     }
 }
